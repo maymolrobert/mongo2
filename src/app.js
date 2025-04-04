@@ -6,12 +6,23 @@ const multer = require('multer');
 const File = require('./models/file');  // Import File model
 
 
+
+
 dotenv.config();
 
 const app = express();
 
+
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
+//app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '..', 'public')));
+
+
+
+app.get('/', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
+});
+
 
 // MongoDB connection
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -39,7 +50,8 @@ app.post('/upload', upload.single('file'), (req, res) => {
     });
 
     newFile.save()
-        .then(() => res.send(`File uploaded successfully: ${req.file.filename}`))
+    .then(() => res.send(`File uploaded successfully: ${req.file.filename}`))
+
         .catch((err) => res.status(500).send('Error saving file info: ' + err));
 });
 
@@ -67,4 +79,5 @@ app.get('/api/files/:id', (req, res) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
+
 });
